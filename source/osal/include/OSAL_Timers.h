@@ -72,13 +72,6 @@ extern "C"
  * FUNCTIONS
  */
 
-#ifdef OSAL_HOOK_START_TIMER_EX
-  /*
-   * Optional start timer hook
-  */
-  void osal_start_timer_hook(uint8 taskID, uint16 event_id, uint32 timeout_value);
-#endif
-
   /*
    * Initialization for the OSAL Timer System.
    */

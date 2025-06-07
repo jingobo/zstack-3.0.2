@@ -261,10 +261,6 @@ uint8 osal_start_timerEx( uint8 taskID, uint16 event_id, uint32 timeout_value )
   halIntState_t intState;
   osalTimerRec_t *newTimer;
 
-#ifdef OSAL_HOOK_START_TIMER_EX
-  osal_start_timer_hook(taskID, event_id, timeout_value);
-#endif
-  
   HAL_ENTER_CRITICAL_SECTION( intState );  // Hold off interrupts.
 
   // Add timer
