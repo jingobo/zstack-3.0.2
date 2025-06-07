@@ -631,6 +631,7 @@ void bdb_ProcessSimpleDesc( zdoIncomingMsg_t *msgPtr )
   else
   {
     //This simple desc rsp was not requested by BDB F&B
+    bdb_zclSimpleDescClusterListClean( &bdb_FindingBindingTargetSimpleDesc );
     return;
   } 
   
