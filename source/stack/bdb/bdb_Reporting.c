@@ -2143,7 +2143,20 @@ ZStatus_t bdb_RepAddAttrCfgRecordDefaultToList( uint8 endpoint, uint16 cluster, 
   return ZSuccess;
 }
 
-static ZStatus_t bdb_RepChangedAttrValueInternal( uint8 endpoint, uint16 cluster, uint16 attrID, bool is_instant )
+ /*********************************************************************
+ * @fn          bdb_RepChangedAttrValue
+ *
+ * @brief       Notify BDB reporting attribute module about the change of an 
+ *              attribute value to validate the triggering of a reporting attribute message.
+ *
+ * @param       endpoint
+ * @param       cluster
+ * @param       attrID - Reporable attribute ID
+ *
+ * @return      ZInvalidParameter - No endpoint, cluster, attribute ID found in simple desc
+ *              ZSuccess
+ */
+ZStatus_t bdb_RepChangedAttrValue( uint8 endpoint, uint16 cluster, uint16 attrID )
 {
   uint8 indexClusterEndpoint = bdb_clusterEndpointArraySearch( endpoint, cluster );
   if( indexClusterEndpoint == BDBREPORTING_INVALIDINDEX ) 
@@ -2187,9 +2200,8 @@ static ZStatus_t bdb_RepChangedAttrValueInternal( uint8 endpoint, uint16 cluster
     isTimeRemaining =  BDBREPORTING_TRUE;
   }
   
-  if(!is_instant &&
-      bdb_reportingClusterEndpointArray[indexClusterEndpoint].consolidatedMinReportInt != BDBREPORTING_NOLIMIT &&
-     (bdb_reportingClusterEndpointArray[indexClusterEndpoint].timeSinceLastReport + elapsedTime) <= bdb_reportingClusterEndpointArray[indexClusterEndpoint].consolidatedMinReportInt)
+  if(bdb_reportingClusterEndpointArray[indexClusterEndpoint].consolidatedMinReportInt != BDBREPORTING_NOLIMIT &&
+    (bdb_reportingClusterEndpointArray[indexClusterEndpoint].timeSinceLastReport + elapsedTime) <= bdb_reportingClusterEndpointArray[indexClusterEndpoint].consolidatedMinReportInt)
   {
       //Attr value has changed before minInterval, ommit reporting
       return ZSuccess;
@@ -2199,7 +2211,7 @@ static ZStatus_t bdb_RepChangedAttrValueInternal( uint8 endpoint, uint16 cluster
   if(zclAnalogDataType(attrRec.dataType) )
   {
     //Checking if   | lastvaluereported - currentvalue | >=  | changevalue |
-    if(!is_instant && bdb_isAttrValueChangedSurpassDelta(attrRec.dataType, attrNodeFound->data->reportableChange, attrRec.dataPtr, attrNodeFound->data->lastValueReported ) == BDBREPORTING_FALSE )
+    if(bdb_isAttrValueChangedSurpassDelta(attrRec.dataType, attrNodeFound->data->reportableChange, attrRec.dataPtr, attrNodeFound->data->lastValueReported ) == BDBREPORTING_FALSE )
     {
       //current value does not excced the delta, dont report
       return ZSuccess;
@@ -2222,42 +2234,6 @@ static ZStatus_t bdb_RepChangedAttrValueInternal( uint8 endpoint, uint16 cluster
   bdb_RepStartReporting( );
   
   return ZSuccess;
-}
-
- /*********************************************************************
- * @fn          bdb_RepChangedAttrValue
- *
- * @brief       Notify BDB reporting attribute module about the change of an 
- *              attribute value to validate the triggering of a reporting attribute message (instanly).
- *
- * @param       endpoint
- * @param       cluster
- * @param       attrID - Reporable attribute ID
- *
- * @return      ZInvalidParameter - No endpoint, cluster, attribute ID found in simple desc
- *              ZSuccess
- */
-ZStatus_t bdb_RepChangedAttrValueInstant(uint8 endpoint, uint16 cluster, uint16 attrID)
-{
-    return bdb_RepChangedAttrValueInternal(endpoint, cluster, attrID, TRUE);
-}
-
- /*********************************************************************
- * @fn          bdb_RepChangedAttrValue
- *
- * @brief       Notify BDB reporting attribute module about the change of an 
- *              attribute value to validate the triggering of a reporting attribute message.
- *
- * @param       endpoint
- * @param       cluster
- * @param       attrID - Reporable attribute ID
- *
- * @return      ZInvalidParameter - No endpoint, cluster, attribute ID found in simple desc
- *              ZSuccess
- */
-ZStatus_t bdb_RepChangedAttrValue( uint8 endpoint, uint16 cluster, uint16 attrID )
-{
-    return bdb_RepChangedAttrValueInternal(endpoint, cluster, attrID, FALSE);
 }
 
 #endif //BDB_REPORTING

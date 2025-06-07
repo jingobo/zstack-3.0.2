@@ -433,12 +433,6 @@ ZStatus_t bdb_RepAddAttrCfgRecordDefaultToList(uint8 endpoint, uint16 cluster, u
  */
 ZStatus_t bdb_RepChangedAttrValue(uint8 endpoint, uint16 cluster, uint16 attrID); //newvalue must a a buffer of size 8
 
-/*
- * @brief   Notify BDB reporting attribute module about the change of an 
- *          attribute value to validate the triggering of a reporting attribute message (instantly).
- */
-ZStatus_t bdb_RepChangedAttrValueInstant(uint8 endpoint, uint16 cluster, uint16 attrID); //newvalue must a a buffer of size 8
-
 #endif
 
  /*****************************
